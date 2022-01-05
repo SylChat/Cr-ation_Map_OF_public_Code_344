@@ -1,2 +1,2 @@
-# Cr-ation_Map_OF_public_Code_344
+# Creation_Map_OF_public_Code_344
 A partir de la base de donnée publique des organisme de formation (https://www.data.gouv.fr/fr/datasets/liste-publique-des-organismes-de-formation-l-6351-7-1-du-code-du-travail/) : -Extraction des organisme dont le code spécialité est 344, puis géocodage de leur adresse via l'API "https://api-adresse.data.gouv.fr/" et enfin création d'une maps répertoriant les organismes précédemment triés
