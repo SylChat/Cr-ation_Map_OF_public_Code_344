@@ -2,7 +2,7 @@
 #Lecture du csv des OF                 #
 ########################################
 #Assignation du chemin des fichiers
-import urllib
+import urllib.request
 
 #définition du lien du fichier csv
 urlFichCsvOF = "https://www.monactiviteformation.emploi.gouv.fr/mon-activite-formation/public/listePubliqueOF?format=csv"
