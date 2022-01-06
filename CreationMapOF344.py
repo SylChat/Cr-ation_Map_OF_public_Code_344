@@ -36,56 +36,66 @@ def LatLong(Ad: str):
     return "Adresse non geocodable"
 #fin de la fonction
 #####################
-
-#définition du lien du fichier csv
-urlFichCsvOF = "https://www.monactiviteformation.emploi.gouv.fr/mon-activite-formation/public/listePubliqueOF?format=csv"
-
-#téléchargement du fichier et enregistrement dans le répertoire
-urllib.request.urlretrieve(urlFichCsvOF,'OF.csv')
-
-#Assignation des variables pour les noms des fichiers
-sCSV = "OF.csv"
-dCSV = "OF_Filtres.csv"
-
-#df = dataframe issu du fichier source (sCSV)
-df = pd.read_csv(sCSV, sep=";", dtype="str")
-
-#dfTrier = dataframe qui recevra les données triées
-#dfTemp = dataframe transitoire
-CodeSST = "344"
-dfTemp = df.loc[((df[' informationsDeclarees.specialitesDeFormation.codeSpecialite1'] == CodeSST)|
-                 (df[' informationsDeclarees.specialitesDeFormation.codeSpecialite2'] == CodeSST)| 
-                 (df[' informationsDeclarees.specialitesDeFormation.codeSpecialite3'] == CodeSST))]
-dfTemp=dfTemp[pd.notnull(dfTemp[' adressePhysiqueOrganismeFormation.ville'])]
-
-#Sélection des colonnes 2,3,5,6,7
-selected_column = dfTemp.iloc[:,[2,3,5,6,7]]
-
-#Copie de la sélection dans le dataframe dfTrier
-dfTrier = selected_column.copy()
-
-#boucle sur chaque pour geocoder les adresses
-for i, row in dfTrier.iterrows():
-  adresse = str(row[' adressePhysiqueOrganismeFormation.voie']) + ", " + str(row[' adressePhysiqueOrganismeFormation.codePostal']) + ", " + str(row[' adressePhysiqueOrganismeFormation.ville'])
-  dfTrier.loc[i,['GPSX','GPSY']] = LatLong(adresse)
-
-#exportation au format CSV
-dfTrier.to_csv(dCSV)
-
 ####################
 #Création de la map#
 ####################
-
+def CreateMap():
 #Création du dataframe
-df_source=pd.read_csv(dCSV,sep=",")
+  df_source=pd.read_csv(dCSV,sep=",")
 
 #Création de la maps vide centrée sur la france
-m = folium.Map(location=[45,5], zoom_start=6)
+  m = folium.Map(location=[45,5], zoom_start=6)
 
 #Ajout des points à la map en bouclant sur les lignes du csv
-for index, row in df_source.iterrows():
-  folium.Marker(location=[row['GPSX'],row['GPSY']],popup=row[' denomination'] + " " + row[' adressePhysiqueOrganismeFormation.voie']).add_to(m)
+  for index, row in df_source.iterrows():
+    folium.Marker(location=[row['GPSX'],row['GPSY']],popup=row[' denomination'] + " " + row[' adressePhysiqueOrganismeFormation.voie']).add_to(m)
 
-#show map
-m.save('Maps.html')
-m
+#save map
+  m.save('Maps.html')
+  exit()
+
+###############################################
+#Fin de la fonction de la création de la carte#
+###############################################
+
+#Si le fichier trié existe déjà, creation direct de la map
+question=input('le fichier est déjà trié?')
+if question=="oui":
+  CreateMap()
+else:
+#définition du lien du fichier csv
+  urlFichCsvOF = "https://www.monactiviteformation.emploi.gouv.fr/mon-activite-formation/public/listePubliqueOF?format=csv"
+
+#téléchargement du fichier et enregistrement dans le répertoire
+  urllib.request.urlretrieve(urlFichCsvOF,'OF.csv')
+
+#Assignation des variables pour les noms des fichiers
+  sCSV = "OF.csv"
+  dCSV = "OF_Filtres.csv"
+
+#df = dataframe issu du fichier source (sCSV)
+  df = pd.read_csv(sCSV, sep=";", dtype="str")
+
+#dfTrier = dataframe qui recevra les données triées
+#dfTemp = dataframe transitoire
+  CodeSST = "344"
+  dfTemp = df.loc[((df[' informationsDeclarees.specialitesDeFormation.codeSpecialite1'] == CodeSST)|
+                   (df[' informationsDeclarees.specialitesDeFormation.codeSpecialite2'] == CodeSST)| 
+                   (df[' informationsDeclarees.specialitesDeFormation.codeSpecialite3'] == CodeSST))]
+  dfTemp=dfTemp[pd.notnull(dfTemp[' adressePhysiqueOrganismeFormation.ville'])]
+
+#Sélection des colonnes 2,3,5,6,7
+  selected_column = dfTemp.iloc[:,[2,3,5,6,7]]
+
+#Copie de la sélection dans le dataframe dfTrier
+  dfTrier = selected_column.copy()
+
+#boucle sur chaque pour geocoder les adresses
+  for i, row in dfTrier.iterrows():
+    adresse = str(row[' adressePhysiqueOrganismeFormation.voie']) + ", " + str(row[' adressePhysiqueOrganismeFormation.codePostal']) + ", " + str(row[' adressePhysiqueOrganismeFormation.ville'])
+    dfTrier.loc[i,['GPSX','GPSY']] = LatLong(adresse)
+
+#exportation au format CSV
+  dfTrier.to_csv(dCSV)
+  CreateMap()
+
